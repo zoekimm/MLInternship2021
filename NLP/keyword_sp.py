@@ -49,7 +49,7 @@ def smdtemplate(file_name):
     return cmd
   
 def load_spm(file, file_list, file_name):
-    #save it as a text file for sentencepiece
+    #create sentence piece
     with open(file_name, mode='wt', encoding='utf-8') as text1:
         text1.write('\n'.join(file_list))
     spm.SentencePieceTrainer.Train(smdtemplate(file_name))
