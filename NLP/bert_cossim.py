@@ -7,7 +7,7 @@ import pickle
 
 def open_memmap():
     vocab_memmap = np.memmap(filename, dtype='float32', mode='r')
-    vocab_memmap = vocab_memmap.reshape((36723,768))
+    vocab_memmap = vocab_memmap.reshape((36723, 768))
     return vocab_memmap
   
 def get_cosmat(mat):
@@ -23,11 +23,31 @@ def create_dic(cosmat):
         d_list.append(d)
         
     return d_list
-  
+
+def extract_top(d_list):
+    new_list = []
+    weight = np.full((20, ), 1)
+    
+    for i in tqdm(range(0, 36723)):
+        arr = d_list[i]['similarity']
+        top_sim = np.sort(arr)[::-1][:20]
+        ranked = np.argsort(d_list[i]['similarity'])
+        largest_indices = ranked[::-1][:20]
+        keyword_list = []
+        
+        for i in largest_indices:
+            keyword_list.append(d_list[i]['keywords'])
+        d = {'keywords' : keyword_list,'similarity' : top_sim, 'weight' : weight}
+        new_list.append(d)
+        
+    return new_list
+
+def to_pickle(new_file):
+    with open('vocab_list.pickle', 'wb') as f:
+        pickle.dump(new_file, f)
+        
 def main():
     mat = open_memmap()
     cosmat = get_cosmat(mat)
     d_list = create_dic(cosmat)
-    
-    with open('vocab.pickle', 'wb') as f:
-        pickle.dump(d_list, f)
+    to_pickle(extract_top(d_list))
