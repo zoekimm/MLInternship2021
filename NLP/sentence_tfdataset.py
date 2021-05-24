@@ -9,69 +9,85 @@ import tensorflow as tf
 
 class sentence_tfdata:
   
-    def __init__(self):
-        self.f = self.get_file()
+    def __init__(self, model, pickle1, pickle2):
+        self.f = self.get_file(pickle1, pickle2)
+        self.sp = self.get_sp(model)
+        self.d = []
         
-    def get_file(self):
-        with open('voice.pickle', 'rb') as pickle2:
-            voice_lstm = pickle.load(pickle2)
-        with open('comments.pickle', 'rb') as pickle1:
-            comments_lstm = pickle.load(pickle1) 
+    def get_sp(self, model):
+        sp = spm.SentencePieceProcessor()
+        sp.load(model)
+        return sp
+
+    def get_file(self, file1, file2):
+    
+        with open(file1, 'rb') as pickle1:
+            voice_lstm = pickle.load(pickle1)
+
+        with open(file2, 'rb') as pickle2:
+            comments_lstm = pickle.load(pickle2) 
+            
         f = []
+            
         for i in voice_lstm:
             f.append(i)
+
         for j in comments_lstm:
             f.append(j)
+            
         return f
-      
-    def load_text(self, filename, data):
-        sp = spm.SentencePieceProcessor()
-        sp.load('spm3_modified.model')
         
-        #write into a text file
-        with open(filename, 'w') as outFile:
-            for i in data[0:2]:
-                id_arr = ",".join(map(str, sp.encode_as_ids(i['sentence']))) 
-                a = list(map(lambda x: x.rstrip(), i['intended_keytalks']))
-                y = self.convert_onehot(self.remove_b(i['intended_keytalks']))
-                line = id_arr + ' : '
-                outFile.write(line)
-                for element in y:
-                    outFile.write(str(element) + ' ')
-                outFile.write('\n')
-        all_ds = tf.data.TextLineDataset(filename)
-        return all_ds
-      
-    def remove_b(self, li):
-        t = []
-        for i in li:
-            t.append(i.rstrip())
-        return t 
-      
+    def create_dict(self):
+        
+        for i in self.f:
+            self.d.append({'sentence': i['sentence'], 'intended_keytalks': i['intended_keytalks']})
+
+            meta_li = []
+            for n in range(5):
+                meta_li.append(self.sp.encode(metaphone(i['sentence']), out_type=str, enable_sampling=True, alpha=0.1, nbest_size=-1))
+            
+            for j in meta_li:
+                self.d.append({'sentence': ' '.join(j), 'intended_keytalks': i['intended_keytalks']})
+        
     def convert_onehot(self, y):
-        with open('word2idx_gen.pickle', 'rb') as pickle2:
+    
+        with open('new_y_word2idx_gen.pickle', 'rb') as pickle2:
             new_y_word2idx_gen = pickle.load(pickle2)
+
         new_y_word2idx_gen2 = {k.rstrip():v for k,v in new_y_word2idx_gen.items()}
         y = list(map(lambda y: new_y_word2idx_gen2[y], y))
         y = tf.one_hot(y, depth = len(new_y_word2idx_gen))  
-        y = tf.reduce_sum(y, axis = 0) 
+        y = tf.reduce_sum(y, axis = 0)  #14096
         return y.numpy()
-      
-    def splitLine(self, line):
-        string = tf.strings.split(line,sep=':')
-        x = tf.strings.split(string[0],sep=',')
-        y = tf.strings.split(string[1],sep=' ')
-        return x,y  
-      
-    def sentence_size(self, length):
-        def _sentence_size(x, y):
-            x = tf.strings.to_number(x, tf.int32) #encode as id -> spm model
-            #x = tf.pad(x,[[0,length-tf.shape(x)[0]]]) #1d 
-            y = tf.strings.to_number(y, tf.int32)
-            return (y,x), y
-        return _sentence_size
-      
-    def execute(self):
-        ds = self.load_text('sentence2.txt', self.f) 
-        ds = ds.shuffle(10000).map(self.splitLine).map(self.sentence_size(128))
-        #save as tfrecord
+    
+    def remove_b(self, li):
+        return [x.rstrip() for x in li]
+    
+    def create_dataset(self):
+            
+        X = list(map(lambda x :self.zero_pad(x['sentence'], 32), self.d))
+
+        Y = list(map(lambda x :self.convert_onehot(self.remove_b(x['intended_keytalks'])), self.d))
+        
+        return tf.data.Dataset.from_tensor_slices(((Y, X), Y))
+        
+    def encode_id(self, i, length):
+        i = self.sp.encode(i)
+        i = tf.pad(i, [[0, length - len(i)]]) #1d 
+        i = tf.cast(i, dtype = tf.int32)
+        return i
+               
+    def __call__(self):
+        self.create_dict()
+        ds = self.create_dataset()
+        for line in ds:
+            print(line)
+            break
+
+    def zero_pad(self, i, X_seq_len = 32):
+        input_ids = [j + 1 for j in self.sp.encode(i)]
+        if len(input_ids) < X_seq_len:
+            n_pad_tokens = X_seq_len - len(input_ids)
+            input_ids.extend([0] * n_pad_tokens)
+            return input_ids
+        return input_ids[:32]
