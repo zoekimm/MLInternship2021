@@ -28,3 +28,10 @@ class LanguagePreprocessor():
     def normalize_text_eng(self):
         self.text = ' '.join(normalise(word_tokenize(self.text), verbose=False))
    
+    def stemming_eng(self):
+        lemmatizer = WordNetLemmatizer()
+        self.text = ' '.join([lemmatizer.lemmatize(w) for w in word_tokenize(self.text)])
+    
+    def stemming_kor(self):
+        okt=Okt() 
+        self.text = ' '.join(okt.nouns(self.text))
