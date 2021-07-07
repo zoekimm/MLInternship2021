@@ -1,3 +1,5 @@
+#Resnet50 implementation
+
 def create_identity_block(x, f1, f2, f3, filter_size):
     temp = x
 
