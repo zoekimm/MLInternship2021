@@ -30,4 +30,27 @@ class similar_word_grouping():
         word_dict_list.append([[i, self.lemmatizer.lemmatize(self.word_preprocess(i))] for i in self.word_list])
         return word_dict_list #list of [word with tag, word without tag]
         
+    def similar(self, a, b):
+        return SequenceMatcher(None, a, b).ratio()
+
+    def find_similar_words(self, threshold, word_dict):
+        d = defaultdict(list)
+        index = 0
+        dup_list = []
+
+        for i in self.word_list: 
+            if i not in dup_list: #avoid duplicates
+                d[index].append(i)
+
+                w = ' '.join([j.split('-')[0] for j in i.split('_')])
+
+                for j in word_dict:
+                    if (i != j[0]) & (self.similar(w, j[1]) > threshold) & (j[0] not in dup_list):
+                        d[index].append(j[0])
+                        dup_list.append(j[0])
+                dup_list.append(i)
+                index += 1
+                
+        return d
+
     
