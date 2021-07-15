@@ -52,3 +52,8 @@ class bert_svd:
         with open(pickle_name, 'wb') as f:
             pickle.dump(new_list, f)
   
+    def __call__(self, input_file, pickle_name):
+            self.get_cosmat()
+            d_list = self.create_dic(input_file)
+            new_list = self.extract_top(d_list)
+            self.to_pickle(new_list, pickle_name)
