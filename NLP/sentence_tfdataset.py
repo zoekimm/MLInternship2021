@@ -40,18 +40,19 @@ class sentence_tfdata:
     def create_dict(self):
         
         for i in self.f:
-            self.d.append({'sentence': i['sentence'], 'intended_keytalks': i['intended_keytalks']})
+            self.d.append({'sentence': i['sentence'], 'intended_keywords': i['intended_keywords']})
 
             meta_li = []
             for n in range(5):
                 meta_li.append(self.sp.encode(metaphone(i['sentence']), out_type=str, enable_sampling=True, alpha=0.1, nbest_size=-1))
             
             for j in meta_li:
-                self.d.append({'sentence': ' '.join(j), 'intended_keytalks': i['intended_keytalks']})
+                self.d.append({'sentence': ' '.join(j), 'intended_keywords': i['intended_keywords']})
         
     def convert_onehot(self, y):
     
-        with open('new_y_word2idx_gen.pickle', 'rb') as pickle2:
+        #words to index pickle file
+        with open('word2idx.pickle', 'rb') as pickle2:
             new_y_word2idx_gen = pickle.load(pickle2)
 
         new_y_word2idx_gen2 = {k.rstrip():v for k,v in new_y_word2idx_gen.items()}
@@ -61,13 +62,14 @@ class sentence_tfdata:
         return y.numpy()
     
     def remove_b(self, li):
+        #remove unnecessary spaces 
         return [x.rstrip() for x in li]
     
     def create_dataset(self):
             
         X = list(map(lambda x :self.zero_pad(x['sentence'], 32), self.d))
 
-        Y = list(map(lambda x :self.convert_onehot(self.remove_b(x['intended_keytalks'])), self.d))
+        Y = list(map(lambda x :self.convert_onehot(self.remove_b(x['intended_keywords'])), self.d))
         
         return tf.data.Dataset.from_tensor_slices(((Y, X), Y))
         
