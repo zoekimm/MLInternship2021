@@ -57,3 +57,12 @@ class bert_svd:
             d_list = self.create_dic(input_file)
             new_list = self.extract_top(d_list)
             self.to_pickle(new_list, pickle_name)
+
+def main(input_mat, dim, input_file, pickle_name):
+    
+    # generate model class 
+    model = bert_svd(input_mat, dim)  
+    
+    # execute model
+    em = model(input_file, pickle_name)
+    return em
