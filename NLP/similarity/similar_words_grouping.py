@@ -25,6 +25,7 @@ class similar_word_grouping():
         
     def get_word_dict_list(self):
         word_dict_list = []
+        #preprocess -> stem -> lemmatize in order 
         word_dict_list.append([[i, self.word_preprocess(i)] for i in self.word_list])
         word_dict_list.append([[i, self.ps.stem(self.word_preprocess(i))] for i in self.word_list])
         word_dict_list.append([[i, self.lemmatizer.lemmatize(self.word_preprocess(i))] for i in self.word_list])
