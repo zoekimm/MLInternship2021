@@ -106,7 +106,7 @@ class spm_new_vocab:
     def add_new_vocab(self, filename):
         m = model.ModelProto()
         #load original sentencepiece model 
-        m.ParseFromString(open("og_spm.model", "rb").read())
+        m.ParseFromString(open(filename, "rb").read())
         
         for token in self.encoded_list:
             new_token = model.ModelProto().SentencePiece()
