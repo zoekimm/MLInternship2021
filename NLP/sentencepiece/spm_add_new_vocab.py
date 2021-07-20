@@ -14,12 +14,15 @@ class spm_new_vocab:
         self.encoded_list = []
         
     def get_sentence(self):
-        with open('voice_lstm_result_2578cnt_lhr_210405.pickle', 'rb') as pickle2:
+        # load pickle file 
+        with open('result1.pickle', 'rb') as pickle2:
             voice_lstm = pickle.load(pickle2)
             
-        with open('comments_lstm_result_3000cnt_lhr_210405.pickle', 'rb') as pickle1:
+        with open('result2.pickle.pickle', 'rb') as pickle1:
             comments_lstm = pickle.load(pickle1) 
             
+        # append sentences to a single list
+
         f = []
         for i in voice_lstm:
             f.append(i['sentence'])
@@ -78,6 +81,9 @@ class spm_new_vocab:
         sp.load(file_name[:-4] + '_spm' +'.model')
         
     def get_encoded_list(self):
+
+        #load sentencepiece model 
+
         s = spm.SentencePieceProcessor(model_file = 'sentence_spm.model')
         file1 = open('sentence_compiled.txt', 'r')
         
@@ -99,7 +105,8 @@ class spm_new_vocab:
                 
     def add_new_vocab(self, filename):
         m = model.ModelProto()
-        m.ParseFromString(open("maimovie_voice_fulldata_spm3.model", "rb").read())
+        #load original sentencepiece model 
+        m.ParseFromString(open("og_spm.model", "rb").read())
         
         for token in self.encoded_list:
             new_token = model.ModelProto().SentencePiece()
@@ -112,4 +119,4 @@ class spm_new_vocab:
     def execute(self):
         self.load_spm('sentence.txt')
         self.get_encoded_list()
-        self.add_new_vocab('maimovie_voice_fulldata_spm3_modified.model')
+        self.add_new_vocab('og_spm.model')
