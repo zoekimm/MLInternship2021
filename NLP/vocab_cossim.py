@@ -42,3 +42,9 @@ def extract_top(d_list):
         new_list.append(d)
         
     return new_list
+
+def to_pickle(new_file):
+    #save it as pickle file
+    with open('vocab_list.pickle', 'wb') as f:
+        pickle.dump(new_file, f)
+
