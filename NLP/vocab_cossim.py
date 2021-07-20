@@ -5,7 +5,8 @@ import pandas as pd
 from tqdm import tqdm
 import pickle
 
-def open_memmap():
+def open_memmap(filename):
+    #open original memmap 
     vocab_memmap = np.memmap(filename, dtype='float32', mode='r')
     vocab_memmap = vocab_memmap.reshape((36723, 768))
     return vocab_memmap
@@ -14,7 +15,7 @@ def get_cosmat(mat):
     return 1-pairwise_distances(mat, metric="cosine")
   
 def create_dic(cosmat):
-    df = pd.read_csv('vocab_list_new.txt', delimiter = "\n", names = ['st'])
+    df = pd.read_csv('vocab_list.txt', delimiter = "\n", names = ['st'])
     d_list = []
     weight = np.full((36723, ), 1)
     
@@ -41,13 +42,3 @@ def extract_top(d_list):
         new_list.append(d)
         
     return new_list
-
-def to_pickle(new_file):
-    with open('vocab_list.pickle', 'wb') as f:
-        pickle.dump(new_file, f)
-        
-def main():
-    mat = open_memmap()
-    cosmat = get_cosmat(mat)
-    d_list = create_dic(cosmat)
-    to_pickle(extract_top(d_list))
