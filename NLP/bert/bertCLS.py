@@ -43,3 +43,18 @@ class bert_CLS:
             arr = np.expand_dims(np.squeeze(y[1]), axis = 0)
             self.mat[index] = arr[:]
     
+def main(input_file, shape):
+    #input_file : file name
+    #shape : dimension
+    
+    # generate model class 
+    model = bert_CLS(shape)  
+    
+    # execute model
+    em = model(input_file)
+    return em
+
+if __name__ == '__main__':
+    input_file = 'vocab_list.txt'
+    shape = (24946, 768)
+    result = main(input_file, shape)
