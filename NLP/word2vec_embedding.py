@@ -24,6 +24,12 @@ class keywords_embedding:
         return list(model.index_to_key)
         
     def format_word(self):    
-        #self.word_key = [' '.join([j.split('-')[0] for j in i.lower().split('_')]) for i in self.word_key]
-    
+        self.word_key = [' '.join([j.split('-')[0] for j in i.lower().split('_')]) for i in self.word_key]
+
+    def __call__(self):
+        self.format_word()
+        word_dict = {word:idx for idx, word in enumerate(self.word_list)}
+        tgt_locations= [word_dict[i] for i in self.word_key]
+        word_embed_transformed = np.take(word_dict, tgt_locations, axis=0)
+        return word_embed_transformed
     
