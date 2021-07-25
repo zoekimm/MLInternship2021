@@ -99,4 +99,28 @@ class vectors_cluster:
         
         del self.d[-1 + size]
             
+        if(len(update_key[-1]) != 0):
+            self.get_kmeans(update_key[-1])
+        
+    def get_kmeans(self, outlier_dic):
+        
+        reword_list = list(outlier_dic)
+        self.indices = list(self.indices)
+        locations = [self.indices.index(i) for i in reword_list]
+        self.vectors = np.take(self.vectors, locations, axis = 0)
+        self.indices = np.take(self.indices, locations, axis = 0)
+        pca = PCA(n_components = 64) #umap
+        self.vectors = pca.fit_transform(self.vectors) #reduce dimension
+        kmeans_clustering = KMeans(n_clusters = int(self.vectors.shape[0]/10))
+        idx = kmeans_clustering.fit_predict(self.vectors)
+        kmeans_dic = {reword_list[i]: idx[i] for i in range(len(reword_list))}
+        
+        size = len(self.d) + 2
+        
+        new_dict = defaultdict(list)
     
+        for k, v in kmeans_dic.items():
+            new_dict[v].append(k) 
+    
+        for k, v in new_dict.items():
+            self.d[k + size] = v
