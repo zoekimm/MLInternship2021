@@ -68,4 +68,35 @@ class vectors_cluster:
                 print("recluster kmeans")
                 self.get_kmeans(self.d[-1])
             
+    def recluster(self):
+        
+        reword_list = list(self.d[-1])
+        self.indices = list(self.indices)
+        locations = [self.indices.index(i) for i in reword_list]
+        self.vectors = np.take(self.vectors, locations, axis = 0)
+        self.indices = np.take(self.indices, locations, axis = 0)
+        clusterable_embedding = umap.UMAP(n_neighbors = self.n_neighbors,
+                                        min_dist = self.min_dist,
+                                        n_components = 64, random_state = 42,).fit_transform(self.vectors)
+        self.label = hdbscan.HDBSCAN(min_cluster_size = self.min_cluster_size, min_samples = self.min_samples).fit_predict(clusterable_embedding)
+    
+        update_key = defaultdict(list)
+        
+        for i, x in enumerate(self.label):
+            update_key[x].append(i)
+            
+        for k, v in update_key.items():
+            update_key[k] = np.take(self.indices, update_key[k], axis = 0)
+        
+        del self.d[-1]
+        size = len(self.d) + 2
+        
+        for k, v in update_key.items():
+            self.d[k + size] = v
+                
+        with open('cluster_2.pickle', 'wb') as f:
+            pickle.dump(self.d, f)
+        
+        del self.d[-1 + size]
+            
     
