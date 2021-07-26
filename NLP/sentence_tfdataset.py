@@ -96,7 +96,7 @@ class sentence_tfdata:
 
 def main():
     # generate model class
-    inputpp = sentence_tfinputpp('voice_spm3_modified.model','voice.pickle', 'comments.pickle')
+    inputpp = sentence_tfdata('voice_spm3_modified.model','voice.pickle', 'comments.pickle')
     
     # execute model
     em = inputpp()
