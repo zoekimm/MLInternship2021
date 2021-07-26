@@ -93,3 +93,13 @@ class sentence_tfdata:
             input_ids.extend([0] * n_pad_tokens)
             return input_ids
         return input_ids[:32]
+
+def main():
+    # generate model class
+    inputpp = sentence_tfinputpp('voice_spm3_modified.model','voice.pickle', 'comments.pickle')
+    
+    # execute model
+    em = inputpp()
+
+if __name__ == '__main__':
+    main()
