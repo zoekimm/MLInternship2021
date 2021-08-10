@@ -5,7 +5,6 @@ import csv
 import nltk
 import os
 from phonetics import metaphone
-#from metaphone import doublemetaphone
 import sentencepiece as spm
 
 def convert(data):
@@ -14,6 +13,7 @@ def convert(data):
         word_list = [metaphone(i) for i in x['sentence'].split(' ')] #metaphone each word
         x['sentence'] = ' '.join(word_list) #join them back to a sentence
         sentence_list.append(x['sentence']) 
+    #compile them into a list 
     return sentence_list
   
 def smdtemplate(file_name):
@@ -49,7 +49,7 @@ def smdtemplate(file_name):
     return cmd
   
 def load_spm(file, file_list, file_name):
-    #create sentence piece
+    #create sentence piece mkodel
     with open(file_name, mode='wt', encoding='utf-8') as text1:
         text1.write('\n'.join(file_list))
     spm.SentencePieceTrainer.Train(smdtemplate(file_name))
@@ -69,6 +69,7 @@ def main():
     with open('comments.pickle', 'rb') as pickle1:
         comments_f = pickle.load(pickle1)
         
+    #append both files 
     file = [voice_f, comments_f]
     file_list = []
     
