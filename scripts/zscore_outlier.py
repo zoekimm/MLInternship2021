@@ -39,11 +39,21 @@ class zscore_outlier():
         return x 
       
     def __call__(self, val):
-        val_z = 0.7 * (val - self.median) / self.median_deviation
+        val_z = 0.6745 * (val - self.median) / self.median_deviation
         val = (val_z - self.og.min()) / (self.og.max() - self.og.min())
         if np.array(self.list).max() < val:
             self.list.append(1)
         else:
             self.list.append(val)
         return self.list
- 
+        
+def main(inputlist, val):
+    model = zscore_outlier(inputlist)  
+    em = model(val)
+    return em
+
+if __name__ == '__main__':
+    #if z_score is given 
+    inputlist = [1.0, 0.5, 0.8, 1000.0]
+    val = 0.7
+    result = main(inputlist, val)
