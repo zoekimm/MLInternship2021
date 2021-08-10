@@ -35,6 +35,6 @@ class movie_tf:
         self.build_model()
         size = int(self.arr.shape[0] * 0.7)
         self.model.compile(optimizer='sgd', loss='mse')
-        self.model.fit(self.arr[:size], self.input[:size], batch_size=32, epochs=10)
+        self.model.fit(self.arr[:size], self.input[:size], batch_size=64, epochs=10)
         results = self.model.evaluate(self.arr[size:], self.input[size:], batch_size=128)
         print('test loss:', results)
