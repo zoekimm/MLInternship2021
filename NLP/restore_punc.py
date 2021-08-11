@@ -36,3 +36,13 @@ class restore_punctuation:
             li.append(str(sentence.text) + '.')
             
         self.d['spacy'] = ' '.join(li)
+
+    def model1_punct(self, text):
+        punctuator1 = Punctuator('INTERSPEECH-T-BRNN.pcl')
+
+        self.d['INTERSPEECH-T-BRNN.pcl(punctuator)'] = punctuator1.punctuate(text)
+
+    def model2_punct(self, text):
+        punctuator2 = Punctuator('Demo-Europarl-EN.pcl')
+
+        self.d['Demo-Europarl-EN.pcl(punctuator)'] = punctuator2.punctuate(text)
