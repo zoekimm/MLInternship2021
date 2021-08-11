@@ -28,6 +28,11 @@ class restore_punctuation:
         
         self.d['fastpunct'] = ' '.join(fastpunct.punct(sent, correct=False))
 
-   
-
-    
+    def spacy_punct(self, text):
+        nlp = spacy.load('en_core_web_sm')
+        text_sentences = nlp(text)
+        li = []
+        for sentence in text_sentences.sents:
+            li.append(str(sentence.text) + '.')
+            
+        self.d['spacy'] = ' '.join(li)
