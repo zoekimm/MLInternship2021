@@ -46,3 +46,33 @@ class restore_punctuation:
         punctuator2 = Punctuator('Demo-Europarl-EN.pcl')
 
         self.d['Demo-Europarl-EN.pcl(punctuator)'] = punctuator2.punctuate(text)
+
+    def __call__(self):
+            df = pd.DataFrame(self.d, columns=['text','fastpunct','spacy','INTERSPEECH-T-BRNN.pcl(punctuator)', 'Demo-Europarl-EN.pcl(punctuator)'])
+            
+            d_list = []
+            for i in self.text_list:
+                self.d['text'] = i
+                self.fastpunct_punct(i)
+                self.spacy_punct(i)
+                self.model1_punct(i)
+                self.model2_punct(i)
+                d_list.append(self.d)
+                self.d = self.get_empty_dict()
+
+            df = pd.DataFrame(d_list)
+            df.to_csv('punctuation_test.csv', index=False)
+        
+def main():
+
+    # generate model class 
+    model = restore_punctuation()  
+
+    # execute model
+    em = model()
+    return em
+
+if __name__ == '__main__':
+    result = main()
+
+                
