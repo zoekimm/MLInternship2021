@@ -5,7 +5,7 @@ from itertools import chain
 from fastpunct import FastPunct
 from punctuator import Punctuator
 
-class restore_punctuation:
+class restore_punctuations:
     
     def __init__(self):
         self.text_list = self.get_text_list()
@@ -66,7 +66,7 @@ class restore_punctuation:
 def main():
 
     # generate model class 
-    model = restore_punctuation()  
+    model = restore_punctuations()  
 
     # execute model
     em = model()
