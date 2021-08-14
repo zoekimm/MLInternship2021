@@ -32,9 +32,31 @@ class movie_tf:
         self.model.add(keras.layers.Dense(self.mat.shape[1]))
         
     def __call__(self):
-        self.build_model()
+        #self.build_model()
+        #size = int(self.arr.shape[0] * 0.7)
+        #self.model.compile(optimizer='sgd', loss='mse')
+        #self.model.fit(self.arr[:size], self.input[:size], batch_size=64, epochs=10)
+        #results = self.model.evaluate(self.arr[size:], self.input[size:], batch_size=128)
+        #print('test loss:', results)
+
+        fig, ax = plt.subplots()
+        plt.xlabel('epoch size')
+        plt.ylabel('accuracy') 
         size = int(self.arr.shape[0] * 0.7)
-        self.model.compile(optimizer='sgd', loss='mse')
-        self.model.fit(self.arr[:size], self.input[:size], batch_size=64, epochs=10)
-        results = self.model.evaluate(self.arr[size:], self.input[size:], batch_size=128)
-        print('test loss:', results)
+        
+        self.build_model()
+        
+        initial_learning_rate = 0.1
+        
+        lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+            initial_learning_rate,
+            decay_steps=100000,
+            decay_rate=0.96,
+            staircase=True)
+
+        self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule),
+                      loss='categorical_crossentropy',
+                      metrics=['accuracy'])
+        
+        #self.model.compile(optimizer = tf.keras.optimizers.Adam(learning_rate = 0.001), loss='mse')
+  
