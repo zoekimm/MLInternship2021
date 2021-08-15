@@ -69,4 +69,5 @@ class movie_tf:
             r_list.append(result[1])
             print(result[1])
             
-
+        plt.plot(input_list, r_list, color="blue", marker="o", ms=5, label="label")  
+        plt.show()
