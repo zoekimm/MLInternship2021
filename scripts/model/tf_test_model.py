@@ -60,3 +60,13 @@ class movie_tf:
         
         #self.model.compile(optimizer = tf.keras.optimizers.Adam(learning_rate = 0.001), loss='mse')
   
+        r_list = []
+        
+        for i in tqdm(input_list):
+            self.model.fit(self.arr[:size], self.input[:size], batch_size = 64, epochs = i)
+            
+            result = self.model.evaluate(self.arr[size:], self.input[size:], batch_size = 64)
+            r_list.append(result[1])
+            print(result[1])
+            
+
